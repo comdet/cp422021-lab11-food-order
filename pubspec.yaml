@@ -1,0 +1,33 @@
+# ตั้งค่าของโปรเจค Flutter — ชื่อโปรเจค แพ็กเกจที่ใช้ และรายการ assets
+#
+# โครงนี้ยังไม่มีแพ็กเกจของ Firebase อยู่เลย (ไม่มี firebase_core · cloud_firestore · firebase_auth)
+# การเพิ่มแพ็กเกจเข้ามาเป็นงานของคุณในแล็บนี้
+name: food_order_lab11
+description: "สตาร์ตเตอร์ Lab 11 — แอปสั่งอาหารที่รันด้วยรายการเมนูตัวอย่างซึ่งเขียนค้างไว้ในโค้ด"
+
+# บรรทัดนี้กันไม่ให้โปรเจคถูกเผยแพร่ขึ้น pub.dev โดยไม่ตั้งใจ
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  # เครื่องหมาย / ท้ายบรรทัดหมายถึงไฟล์ทุกไฟล์ที่อยู่ในโฟลเดอร์นั้นโดยตรง
+  assets:
+    - assets/images/

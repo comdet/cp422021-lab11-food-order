@@ -1,0 +1,16 @@
+# ไฟล์นี้ตั้งค่าตัวตรวจโค้ด (analyzer) ที่อ่านโค้ด Dart แล้วรายงานข้อผิดพลาดและคำเตือน
+# เรียกจากบรรทัดคำสั่งได้ด้วย flutter analyze
+
+# บรรทัดข้างล่างเปิดชุดกฎที่ทีม Flutter แนะนำสำหรับแอปและแพ็กเกจ
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+
+linter:
+  # เพิ่มหรือปิดกฎรายข้อได้ในส่วนนี้
+  # รายการกฎทั้งหมดอยู่ที่ https://dart.dev/lints
+  rules:
+    # prefer_single_quotes: true
