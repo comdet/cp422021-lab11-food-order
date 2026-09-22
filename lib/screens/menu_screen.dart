@@ -20,6 +20,7 @@ import '../models/menu_item.dart';
 import '../repositories/menu_repository.dart';
 import '../theme.dart';
 import '../widgets/menu_card.dart';
+import '../widgets/menu_skeleton.dart';
 import 'cart_screen.dart';
 import 'login_screen.dart';
 
@@ -77,33 +78,38 @@ class _MenuScreenState extends State<MenuScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('เมนูของร้าน'),
-        backgroundColor: AppColors.brand,
-        foregroundColor: Colors.white,
         actions: <Widget>[
           IconButton(
             onPressed: _openLogin,
             tooltip: 'เข้าสู่ระบบ',
-            icon: const Icon(Icons.person),
+            icon: const Icon(Icons.person_outline),
           ),
           _cartButton(),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpace.sm),
         ],
       ),
       body: FutureBuilder<List<MenuItem>>(
         future: _menuRequest,
         builder: (BuildContext context, AsyncSnapshot<List<MenuItem>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            // โครงร่างเทาแทนวงกลมหมุน — ผู้ใช้เห็นทันทีว่ากำลังจะมีรายการกี่แถว
+            // และหน้าจอไม่กระโดดเมื่อข้อมูลมาถึง
+            return const MenuSkeletonList();
           }
           if (snapshot.hasError) {
             return _errorView(snapshot.error);
           }
           final List<MenuItem> items = snapshot.data ?? const <MenuItem>[];
           if (items.isEmpty) {
-            return const Center(child: Text('ยังไม่มีรายการเมนู'));
+            return _emptyView();
           }
           return ListView.builder(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpace.lg,
+              AppSpace.lg,
+              AppSpace.lg,
+              AppSpace.xl,
+            ),
             itemCount: items.length,
             itemBuilder: (BuildContext context, int index) {
               final MenuItem item = items[index];
@@ -122,39 +128,78 @@ class _MenuScreenState extends State<MenuScreen> {
       listenable: cart,
       builder: (BuildContext context, Widget? child) {
         final int count = cart.totalQuantity;
-        return TextButton.icon(
+        return IconButton(
           onPressed: _openCart,
-          icon: const Icon(Icons.shopping_cart, color: Colors.white),
-          label: Text(
-            count < 1 ? 'ตะกร้า' : 'ตะกร้า $count',
-            style: const TextStyle(color: Colors.white),
+          tooltip: count < 1 ? 'ตะกร้า' : 'ตะกร้า $count ชิ้น',
+          icon: Badge(
+            isLabelVisible: count > 0,
+            backgroundColor: Colors.white,
+            textColor: AppColors.brand,
+            label: Text('$count'),
+            child: const Icon(Icons.shopping_cart_outlined),
           ),
         );
       },
     );
   }
 
+  /// จอตอนที่ขอรายการเมนูสำเร็จแต่ไม่มีข้อมูลสักรายการ
+  /// อาการนี้เกิดบ่อยตอนทำงานข้อ ① เสร็จใหม่ ๆ แต่ยังไม่ได้กรอกเมนูในคอนโซล
+  Widget _emptyView() {
+    return _stateView(
+      icon: Icons.restaurant_menu,
+      title: 'ยังไม่มีรายการเมนู',
+      detail:
+          'อ่านข้อมูลได้แล้วแต่ไม่พบรายการใดเลย '
+          'ถ้าเพิ่งต่อฐานข้อมูลเสร็จ ให้กลับไปกรอกเมนูในหน้าคอนโซลก่อน',
+      tone: AppColors.textMuted,
+    );
+  }
+
   /// จอที่แสดงเมื่อขอรายการเมนูไม่สำเร็จ
   /// ข้อความที่แสดงคือข้อความจริงที่ repository โยนออกมา ไม่ได้เขียนทับ
   Widget _errorView(Object? error) {
+    return _stateView(
+      icon: Icons.cloud_off,
+      title: 'โหลดรายการเมนูไม่สำเร็จ',
+      detail: '$error',
+      tone: AppColors.danger,
+    );
+  }
+
+  /// โครงร่วมของจอว่างและจอผิดพลาด — ไอคอน หัวข้อ คำอธิบาย และปุ่มลองใหม่
+  Widget _stateView({
+    required IconData icon,
+    required String title,
+    required String detail,
+    required Color tone,
+  }) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpace.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Text('โหลดรายการเมนูไม่สำเร็จ'),
-            const SizedBox(height: 8),
+            Container(
+              width: 96,
+              height: 96,
+              decoration: BoxDecoration(
+                color: tone.withValues(alpha: 0.10),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 44, color: tone),
+            ),
+            const SizedBox(height: AppSpace.lg),
+            Text(title, style: textTheme.titleLarge),
+            const SizedBox(height: AppSpace.sm),
             Text(
-              '$error',
+              detail,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.danger),
+              style: textTheme.bodySmall,
             ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _reloadMenu,
-              child: const Text('ลองใหม่'),
-            ),
+            const SizedBox(height: AppSpace.xl),
+            FilledButton(onPressed: _reloadMenu, child: const Text('ลองใหม่')),
           ],
         ),
       ),

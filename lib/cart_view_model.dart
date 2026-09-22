@@ -31,21 +31,31 @@ class CartViewModel extends ChangeNotifier {
 
   /// จำนวนชิ้นรวมทุกรายการ ใช้แสดงบนปุ่มตะกร้า
   int get totalQuantity {
-    return _lines.fold<int>(0, (int sum, OrderLine line) => sum + line.quantity);
+    return _lines.fold<int>(
+      0,
+      (int sum, OrderLine line) => sum + line.quantity,
+    );
   }
 
   /// ยอดรวมเป็นบาท
   int get totalPrice {
-    return _lines.fold<int>(0, (int sum, OrderLine line) => sum + line.lineTotal);
+    return _lines.fold<int>(
+      0,
+      (int sum, OrderLine line) => sum + line.lineTotal,
+    );
   }
 
   /// เพิ่มเมนูหนึ่งรายการเข้าตะกร้า ถ้ามีรายการนั้นอยู่แล้วให้เพิ่มจำนวนแทน
   void addOne(MenuItem item) {
-    final int index = _lines.indexWhere((OrderLine line) => line.item.id == item.id);
+    final int index = _lines.indexWhere(
+      (OrderLine line) => line.item.id == item.id,
+    );
     if (index < 0) {
       _lines.add(OrderLine(item: item, quantity: 1));
     } else {
-      _lines[index] = _lines[index].copyWithQuantity(_lines[index].quantity + 1);
+      _lines[index] = _lines[index].copyWithQuantity(
+        _lines[index].quantity + 1,
+      );
     }
     // ถ้าไม่เรียกบรรทัดนี้ จอที่ฟังอยู่จะไม่วาดใหม่
     notifyListeners();
@@ -53,7 +63,9 @@ class CartViewModel extends ChangeNotifier {
 
   /// ลดจำนวนของเมนูรายการหนึ่งลงหนึ่งชิ้น ถ้าเหลือศูนย์ให้เอาออกจากตะกร้า
   void removeOne(MenuItem item) {
-    final int index = _lines.indexWhere((OrderLine line) => line.item.id == item.id);
+    final int index = _lines.indexWhere(
+      (OrderLine line) => line.item.id == item.id,
+    );
     if (index < 0) {
       return;
     }

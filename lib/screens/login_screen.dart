@@ -46,7 +46,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   /// เรียกงานหนึ่งอย่างของ auth_service แล้วแสดงผลที่ได้
-  Future<void> _run(Future<void> Function() action, String successMessage) async {
+  Future<void> _run(
+    Future<void> Function() action,
+    String successMessage,
+  ) async {
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
     }
@@ -131,21 +134,103 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// หัวจอ — บอกว่าจอนี้ทำอะไร และทำให้ครึ่งบนของจอไม่ว่างเปล่า
+  Widget _header() {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            color: AppColors.brandSoft,
+            borderRadius: BorderRadius.circular(AppSpace.radiusCard),
+          ),
+          child: const Icon(
+            Icons.ramen_dining,
+            size: 34,
+            color: AppColors.brand,
+          ),
+        ),
+        const SizedBox(height: AppSpace.lg),
+        Text('เข้าสู่ระบบเพื่อสั่งอาหาร', style: textTheme.headlineSmall),
+        const SizedBox(height: AppSpace.sm),
+        Text(
+          'ออเดอร์ที่สั่งจะถูกบันทึกไว้กับบัญชีนี้ ยังไม่มีบัญชีให้กดสมัครบัญชีใหม่ได้เลย',
+          style: textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+
+  /// กล่องข้อความผลลัพธ์ — สีเขียวเมื่อสำเร็จ สีแดงเมื่อผิดพลาด
+  Widget _messageBox(String message) {
+    final Color tone = _messageIsError ? AppColors.danger : AppColors.success;
+    return Container(
+      padding: const EdgeInsets.all(AppSpace.md),
+      decoration: BoxDecoration(
+        color: tone.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppSpace.radiusControl),
+        border: Border.all(color: tone.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Icon(
+            _messageIsError ? Icons.error_outline : Icons.check_circle_outline,
+            size: 20,
+            color: tone,
+          ),
+          const SizedBox(width: AppSpace.sm),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: tone),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// คำเตือนเรื่องรหัสผ่าน — อยู่ท้ายจอเพราะเป็นข้อมูลประกอบ ไม่ใช่ขั้นตอน
+  Widget _note() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const Icon(Icons.info_outline, size: 18, color: AppColors.textMuted),
+        const SizedBox(width: AppSpace.sm),
+        Expanded(
+          child: Text(
+            'บัญชีที่สมัครในแล็บนี้เป็นบัญชีทดสอบ อย่าใช้รหัสผ่านจริงที่ใช้ที่อื่น',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('เข้าสู่ระบบ'),
-        backgroundColor: AppColors.brand,
-        foregroundColor: Colors.white,
-      ),
+      appBar: AppBar(title: const Text('เข้าสู่ระบบ')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpace.xl,
+          AppSpace.xl,
+          AppSpace.xl,
+          AppSpace.xl,
+        ),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
+              _header(),
+              const SizedBox(height: AppSpace.xl),
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
@@ -164,7 +249,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: AppSpace.md),
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
@@ -179,34 +264,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpace.xl),
               FilledButton(
                 onPressed: _busy ? null : _signIn,
                 child: const Text('เข้าสู่ระบบ'),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSpace.md),
               OutlinedButton(
                 onPressed: _busy ? null : _register,
                 child: const Text('สมัครบัญชีใหม่'),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSpace.sm),
               TextButton(
                 onPressed: _busy ? null : _signOut,
                 child: const Text('ออกจากระบบ'),
               ),
               if (_busy) ...<Widget>[
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpace.lg),
                 const Center(child: CircularProgressIndicator()),
               ],
               if (_message != null) ...<Widget>[
-                const SizedBox(height: 16),
-                Text(
-                  _message!,
-                  style: TextStyle(
-                    color: _messageIsError ? AppColors.danger : AppColors.success,
-                  ),
-                ),
+                const SizedBox(height: AppSpace.lg),
+                _messageBox(_message!),
               ],
+              const SizedBox(height: AppSpace.xl),
+              _note(),
             ],
           ),
         ),
