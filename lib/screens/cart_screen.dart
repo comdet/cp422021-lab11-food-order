@@ -3,7 +3,7 @@
 //
 // ลำดับที่เกิดขึ้นเมื่อกดปุ่มสั่ง
 //   1. ถาม AuthService ว่ามีบัญชีใดเข้าสู่ระบบอยู่ (งานข้อ ②)
-//      ถ้ายังไม่มี จอนี้จะพาผู้ใช้ไปหน้าเข้าสู่ระบบ
+//      ถ้ายังไม่มี จอนี้จะสลับแถบล่างไปที่ปุ่มบัญชี ซึ่งเป็นจอเข้าสู่ระบบ
 //   2. รวบรวมของในตะกร้าเป็นออเดอร์หนึ่งใบ แล้วส่งให้ OrderRepository (งานข้อ ③)
 //      พร้อมรหัสประจำตัวผู้ใช้ (uid) ของบัญชีที่เข้าสู่ระบบอยู่
 //
@@ -25,7 +25,7 @@ import '../models/food_order.dart';
 import '../repositories/order_repository.dart';
 import '../theme.dart';
 import '../widgets/food_image.dart';
-import 'login_screen.dart';
+import 'app_shell.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -39,9 +39,8 @@ class _CartScreenState extends State<CartScreen> {
   bool _sending = false;
 
   Future<void> _placeOrder() async {
-    // อ้างถึงสองตัวนี้ไว้ก่อนเรียกงานที่ต้องรอ เพราะหลังจากรอแล้วหน้าจออาจถูกปิดไปแล้ว
+    // อ้างถึงตัวนี้ไว้ก่อนเรียกงานที่ต้องรอ เพราะหลังจากรอแล้วหน้าจออาจถูกปิดไปแล้ว
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-    final NavigatorState navigator = Navigator.of(context);
 
     String? uid;
     try {
@@ -54,11 +53,7 @@ class _CartScreenState extends State<CartScreen> {
     if (uid == null) {
       // ยังไม่มีบัญชีใดเข้าสู่ระบบ — พาไปหน้าเข้าสู่ระบบก่อน
       _show(messenger, 'ต้องเข้าสู่ระบบก่อนจึงจะสั่งได้');
-      await navigator.push(
-        MaterialPageRoute<void>(
-          builder: (BuildContext context) => const LoginScreen(),
-        ),
-      );
+      shellTab.value = 2;
       return;
     }
 
@@ -148,7 +143,7 @@ class _CartScreenState extends State<CartScreen> {
             ),
             const SizedBox(height: AppSpace.xl),
             OutlinedButton(
-              onPressed: () => Navigator.of(context).maybePop(),
+              onPressed: () => shellTab.value = 0,
               child: const Text('กลับไปเลือกเมนู'),
             ),
           ],

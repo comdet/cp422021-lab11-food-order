@@ -7,7 +7,8 @@
 // ── ส่วนที่ให้มาแล้ว (ไม่ต้องแก้ในแล็บนี้) ──────────────────────────────────
 //   - การแสดงภาพ ชื่อ และราคา
 //   - กรอบแทนภาพเมื่อไม่มีภาพของรายการนั้น หรือเปิดไฟล์ภาพไม่สำเร็จ
-//   - ปุ่มเพิ่มลงตะกร้า ซึ่งเรียกฟังก์ชันที่จอเมนูส่งเข้ามาทาง onAdd
+//   - ปุ่มเพิ่มลงตะกร้า ซึ่งเรียกฟังก์ชันที่หน้าแรกส่งเข้ามาทาง onAdd
+//   - การกดที่ตัวการ์ดเพื่อเปิดจอรายละเอียด ผ่าน onOpen
 //
 // ไฟล์นี้ไม่มีจุดที่ต้องเติม
 // ============================================================================
@@ -18,12 +19,20 @@ import '../theme.dart';
 import 'food_image.dart';
 
 class MenuCard extends StatelessWidget {
-  const MenuCard({super.key, required this.item, required this.onAdd});
+  const MenuCard({
+    super.key,
+    required this.item,
+    required this.onAdd,
+    required this.onOpen,
+  });
 
   final MenuItem item;
 
-  /// ฟังก์ชันที่จอเมนูส่งเข้ามา เรียกเมื่อผู้ใช้กดปุ่มเพิ่มลงตะกร้า
+  /// เรียกเมื่อผู้ใช้กดปุ่มบวก เพื่อเพิ่มรายการนี้ลงตะกร้าหนึ่งชิ้น
   final VoidCallback onAdd;
+
+  /// เรียกเมื่อผู้ใช้กดที่ตัวการ์ด เพื่อเปิดจอรายละเอียดของรายการนี้
+  final VoidCallback onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +50,7 @@ class MenuCard extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: onAdd,
+            onTap: onOpen,
             // IntrinsicHeight กำหนดความสูงของแถวให้เท่ากับชิ้นที่สูงที่สุดในแถว
             // ถ้าไม่มีบรรทัดนี้ ภาพจะไม่รู้ว่าต้องสูงเท่าใดเพราะรายการเลื่อนได้
             // มีความสูงไม่จำกัด

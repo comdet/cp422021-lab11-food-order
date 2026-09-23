@@ -2,7 +2,7 @@
 // main.dart — จุดเริ่มทำงานของแอป
 //
 // ลำดับการทำงาน: ฟังก์ชัน main() เรียก runApp() · runApp() วาด MaterialApp
-// ซึ่งกำหนดชื่อแอป ธีมจาก theme.dart และหน้าแรกคือจอเมนู
+// ซึ่งกำหนดชื่อแอป ธีมจาก theme.dart และจอแรกคือ AppShell ที่มีแถบล่างสามปุ่ม
 //
 // ── ส่วนที่ให้มาแล้ว (ไม่ต้องแก้) ────────────────────────────────────────────
 //   - การประกอบแอปและการกำหนดหน้าแรก
@@ -13,7 +13,7 @@
 // ============================================================================
 import 'package:flutter/material.dart';
 
-import 'screens/menu_screen.dart';
+import 'screens/app_shell.dart';
 import 'theme.dart';
 
 void main() {
@@ -29,7 +29,7 @@ class FoodOrderApp extends StatelessWidget {
       title: 'สั่งอาหาร',
       debugShowCheckedModeBanner: false,
       theme: appTheme(),
-      home: const MenuScreen(),
+      home: const AppShell(),
     );
   }
 }
