@@ -12,6 +12,16 @@
 // ============================================================================
 import '../models/restaurant.dart';
 
+/// รหัสของร้านที่ผู้ใช้เคยสั่ง เรียงจากที่สั่งล่าสุด
+///
+/// ★ ในแล็บนี้เป็นข้อมูลตัวอย่างที่เขียนค้างไว้ในโค้ด
+///   การอ่านประวัติการสั่งจริงจากฐานข้อมูลเป็นเรื่องของสัปดาห์ถัดไป
+const List<String> recentRestaurantIds = <String>[
+  'phat-thai-jao-dang',
+  'kuay-teow-mu-tun',
+  'ping-yang-korat',
+];
+
 const List<Restaurant> demoRestaurants = <Restaurant>[
   Restaurant(
     id: 'ban-khao-kaeng',

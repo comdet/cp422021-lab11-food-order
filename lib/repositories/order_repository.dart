@@ -11,7 +11,7 @@
 //     มาให้พร้อมแล้ว
 //
 // ── ส่วนที่คุณต้องเติม (มองหาคำว่า "จุดที่ต้องเติม") ──────────────────────────
-//   - placeOrder()   งานข้อ ③
+//   - placeOrder()   งานข้อ ⑤
 // ============================================================================
 import '../models/food_order.dart';
 
@@ -22,7 +22,7 @@ class OrderRepository {
   /// ตัวเดียวที่ทั้งแอปใช้ร่วมกัน เรียกด้วย OrderRepository.instance.placeOrder(...)
   static final OrderRepository instance = OrderRepository._();
 
-  // ── ★ จุดที่ต้องเติม (งานข้อ ③) — เขียนเอกสารออเดอร์ลง Cloud Firestore ──────
+  // ── ★ จุดที่ต้องเติม (งานข้อ ⑤) — เขียนเอกสารออเดอร์ลง Cloud Firestore ──────
   // ต้องทำ: เขียนเอกสารออเดอร์หนึ่งเอกสารลง Cloud Firestore จริง
   //   เอกสารนั้นต้องมีฟิลด์ที่เก็บรหัสประจำตัวผู้ใช้ (uid) ของบัญชีที่กำลัง
   //   เข้าสู่ระบบอยู่ ซึ่งส่งเข้ามาทางพารามิเตอร์ uid ข้างล่างนี้
@@ -38,6 +38,6 @@ class OrderRepository {
     required FoodOrder order,
     required String uid,
   }) async {
-    throw UnimplementedError('ยังไม่ได้ทำ — งานข้อ ③ ของแล็บ');
+    throw UnimplementedError('ยังไม่ได้ทำ — งานข้อ ⑤ ของแล็บ');
   }
 }
