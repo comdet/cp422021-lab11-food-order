@@ -12,15 +12,22 @@
 import 'package:flutter/material.dart';
 
 import '../cart_view_model.dart';
-import '../data/shop_info.dart';
 import '../models/menu_item.dart';
+import '../models/restaurant.dart';
 import '../theme.dart';
 import '../widgets/food_image.dart';
 
 class MenuDetailScreen extends StatefulWidget {
-  const MenuDetailScreen({super.key, required this.item});
+  const MenuDetailScreen({
+    super.key,
+    required this.item,
+    required this.restaurant,
+  });
 
   final MenuItem item;
+
+  /// ร้านที่เมนูนี้อยู่ ใช้แสดงบนแถบร้านและใช้ตอนเพิ่มลงตะกร้า
+  final Restaurant restaurant;
 
   @override
   State<MenuDetailScreen> createState() => _MenuDetailScreenState();
@@ -30,6 +37,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
   int _quantity = 1;
 
   void _addToCart() {
+    cart.restaurant = widget.restaurant;
     for (int i = 0; i < _quantity; i++) {
       cart.addOne(widget.item);
     }
@@ -95,9 +103,9 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
     );
   }
 
-  /// แถบร้านที่ขายเมนูนี้ — ข้อมูลมาจาก ShopInfo ซึ่งเป็นค่าคงที่ของแอป
+  /// แถบร้านที่ขายเมนูนี้
   Widget _shopRow() {
-    const ShopInfo shop = ShopInfo.demo;
+    final Restaurant shop = widget.restaurant;
     final TextTheme textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.all(AppSpace.md),
@@ -129,7 +137,8 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                 Text(shop.name, style: textTheme.titleMedium),
                 Text(
                   'ส่ง ${shop.deliveryMinutes} นาที · '
-                  '${shop.rating} (${shop.ratingCount} รีวิว)',
+                  '${shop.rating} (${shop.ratingCount} รีวิว) · '
+                  '${shop.area}',
                   style: textTheme.bodySmall,
                 ),
               ],
@@ -150,7 +159,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
         Expanded(
           child: Text(
             'กดเพิ่มลงตะกร้าแล้วรายการจะไปรออยู่ในตะกร้าก่อน '
-            'ออเดอร์จะถูกส่งจริงเมื่อกดปุ่มสั่งอาหารที่จอตะกร้า',
+            'ออเดอร์จะถูกส่งให้คนส่งอาหารเมื่อกดปุ่มที่จอตะกร้า',
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ),

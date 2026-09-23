@@ -21,7 +21,9 @@ import 'package:flutter/material.dart';
 
 import '../auth_service.dart';
 import '../cart_view_model.dart';
+import '../data/delivery_info.dart';
 import '../models/food_order.dart';
+import '../my_orders_store.dart';
 import '../repositories/order_repository.dart';
 import '../theme.dart';
 import '../widgets/food_image.dart';
@@ -53,7 +55,7 @@ class _CartScreenState extends State<CartScreen> {
     if (uid == null) {
       // ยังไม่มีบัญชีใดเข้าสู่ระบบ — พาไปหน้าเข้าสู่ระบบก่อน
       _show(messenger, 'ต้องเข้าสู่ระบบก่อนจึงจะสั่งได้');
-      shellTab.value = 2;
+      shellTab.value = 3;
       return;
     }
 
@@ -63,8 +65,10 @@ class _CartScreenState extends State<CartScreen> {
     });
     try {
       await OrderRepository.instance.placeOrder(order: order, uid: uid);
+      myOrders.add(order);
       cart.clear();
-      _show(messenger, 'ส่งออเดอร์เรียบร้อย');
+      _show(messenger, 'ส่งออเดอร์แล้ว รอคนส่งรับงาน');
+      shellTab.value = 1;
     } on UnimplementedError catch (error) {
       _show(messenger, error.message ?? 'ยังทำงานข้อ ③ ไม่เสร็จ');
     } catch (error) {
@@ -93,17 +97,20 @@ class _CartScreenState extends State<CartScreen> {
           if (cart.isEmpty) {
             return _emptyView();
           }
-          return ListView.builder(
+          return ListView(
             padding: const EdgeInsets.fromLTRB(
               AppSpace.lg,
               AppSpace.lg,
               AppSpace.lg,
               AppSpace.lg,
             ),
-            itemCount: cart.lines.length,
-            itemBuilder: (BuildContext context, int index) {
-              return _lineTile(cart.lines[index]);
-            },
+            children: <Widget>[
+              _fromRestaurant(),
+              const SizedBox(height: AppSpace.md),
+              ...cart.lines.map(_lineTile),
+              const SizedBox(height: AppSpace.sm),
+              _addressCard(),
+            ],
           );
         },
       ),
@@ -137,17 +144,73 @@ class _CartScreenState extends State<CartScreen> {
             Text('ยังไม่มีของในตะกร้า', style: textTheme.titleLarge),
             const SizedBox(height: AppSpace.sm),
             Text(
-              'กลับไปที่จอเมนูแล้วกดปุ่มบวกที่รายการที่ต้องการ',
+              'เลือกร้านจากหน้าแรก เข้าไปในร้าน แล้วกดปุ่มบวกที่เมนูที่ต้องการ',
               textAlign: TextAlign.center,
               style: textTheme.bodySmall,
             ),
             const SizedBox(height: AppSpace.xl),
             OutlinedButton(
               onPressed: () => shellTab.value = 0,
-              child: const Text('กลับไปเลือกเมนู'),
+              child: const Text('ไปเลือกร้าน'),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// แถบบอกว่าของในตะกร้ามาจากร้านใด — หนึ่งออเดอร์สั่งได้จากร้านเดียว
+  Widget _fromRestaurant() {
+    final String name = cart.restaurant?.name ?? '';
+    if (name.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Row(
+      children: <Widget>[
+        const Icon(Icons.storefront, size: 18, color: AppColors.brand),
+        const SizedBox(width: AppSpace.sm),
+        Expanded(
+          child: Text(
+            'สั่งจาก $name',
+            style: Theme.of(context).textTheme.titleMedium,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// การ์ดที่อยู่ปลายทาง — แอปส่งอาหารต้องเห็นตลอดว่าจะเอาไปส่งที่ไหน
+  Widget _addressCard() {
+    const DeliveryInfo delivery = DeliveryInfo.demo;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.all(AppSpace.lg),
+      decoration: BoxDecoration(
+        color: AppColors.brandSoft,
+        borderRadius: BorderRadius.circular(AppSpace.radiusCard),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          const Icon(Icons.delivery_dining, color: AppColors.brand),
+          const SizedBox(width: AppSpace.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'ส่งไปที่ · ${delivery.label}',
+                  style: textTheme.bodySmall,
+                ),
+                Text(delivery.address, style: textTheme.titleMedium),
+                const SizedBox(height: AppSpace.xs),
+                Text('ค่าส่ง ${delivery.fee} บาท', style: textTheme.bodySmall),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -273,9 +336,12 @@ class _CartScreenState extends State<CartScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('ยอดรวม', style: textTheme.bodySmall),
                       Text(
-                        '${cart.totalPrice} บาท',
+                        'รวมค่าส่ง ${DeliveryInfo.demo.fee} บาท',
+                        style: textTheme.bodySmall,
+                      ),
+                      Text(
+                        '${cart.totalPrice + DeliveryInfo.demo.fee} บาท',
                         style: textTheme.titleLarge?.copyWith(
                           color: AppColors.brand,
                         ),
@@ -286,7 +352,7 @@ class _CartScreenState extends State<CartScreen> {
                   Expanded(
                     child: FilledButton(
                       onPressed: canSend ? _placeOrder : null,
-                      child: Text(_sending ? 'กำลังส่ง' : 'สั่งอาหาร'),
+                      child: Text(_sending ? 'กำลังส่ง' : 'สั่งและให้ไปส่ง'),
                     ),
                   ),
                 ],

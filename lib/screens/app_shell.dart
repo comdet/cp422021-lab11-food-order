@@ -8,7 +8,7 @@
 // ยังจำสถานะของตัวเองไว้ เช่น ตำแหน่งที่เลื่อนค้างไว้ และคำที่พิมพ์ในช่องค้นหา
 //
 // ── ส่วนที่ให้มาแล้ว (ไม่ต้องแก้ในแล็บนี้) ──────────────────────────────────
-//   - แถบล่างสามปุ่ม หน้าแรก · ตะกร้า · บัญชี
+//   - แถบล่างสี่ปุ่ม หน้าแรก · ออเดอร์ของฉัน · ตะกร้า · บัญชี
 //   - ป้ายจำนวนชิ้นบนปุ่มตะกร้า ซึ่งเปลี่ยนตามตะกร้าเอง
 //   - shellTab ตัวแปรที่จออื่นใช้สั่งให้สลับปุ่มได้
 //
@@ -21,8 +21,9 @@ import '../theme.dart';
 import 'cart_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
+import 'my_orders_screen.dart';
 
-/// ปุ่มที่กำลังเลือกอยู่บนแถบล่าง — 0 หน้าแรก · 1 ตะกร้า · 2 บัญชี
+/// ปุ่มที่กำลังเลือกอยู่บนแถบล่าง — 0 หน้าแรก · 1 ออเดอร์ของฉัน · 2 ตะกร้า · 3 บัญชี
 ///
 /// ประกาศไว้นอกคลาสเพื่อให้จออื่นสั่งสลับได้ เช่น จอตะกร้าตอนที่ว่าง
 /// มีปุ่มพากลับไปหน้าแรก
@@ -39,7 +40,12 @@ class AppShell extends StatelessWidget {
         return Scaffold(
           body: IndexedStack(
             index: index,
-            children: const <Widget>[HomeScreen(), CartScreen(), LoginScreen()],
+            children: const <Widget>[
+              HomeScreen(),
+              MyOrdersScreen(),
+              CartScreen(),
+              LoginScreen(),
+            ],
           ),
           bottomNavigationBar: _bottomBar(index),
         );
@@ -59,9 +65,14 @@ class AppShell extends StatelessWidget {
           indicatorColor: AppColors.brandSoft,
           destinations: <Widget>[
             const NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home, color: AppColors.brand),
-              label: 'หน้าแรก',
+              icon: Icon(Icons.storefront_outlined),
+              selectedIcon: Icon(Icons.storefront, color: AppColors.brand),
+              label: 'ร้านอาหาร',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.receipt_long_outlined),
+              selectedIcon: Icon(Icons.receipt_long, color: AppColors.brand),
+              label: 'ออเดอร์',
             ),
             NavigationDestination(
               icon: Badge(

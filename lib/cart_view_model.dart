@@ -17,8 +17,10 @@
 // ============================================================================
 import 'package:flutter/foundation.dart';
 
+import 'data/delivery_info.dart';
 import 'models/food_order.dart';
 import 'models/menu_item.dart';
+import 'models/restaurant.dart';
 
 class CartViewModel extends ChangeNotifier {
   final List<OrderLine> _lines = <OrderLine>[];
@@ -84,12 +86,31 @@ class CartViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// ร้านที่ของในตะกร้ามาจาก — ตั้งค่าเมื่อเพิ่มรายการแรกเข้าตะกร้า
+  ///
+  /// แอปส่งอาหารสั่งข้ามร้านในออเดอร์เดียวไม่ได้ เพราะคนส่งหนึ่งคนไปรับที่ร้านเดียว
+  /// ถ้าเลือกร้านใหม่ทั้งที่ยังมีของค้างอยู่ จอจะถามก่อนล้างตะกร้า
+  Restaurant? restaurant;
+
+  /// เปลี่ยนร้านของตะกร้า พร้อมล้างของเดิมทิ้ง
+  void switchRestaurant(Restaurant next) {
+    _lines.clear();
+    restaurant = next;
+    notifyListeners();
+  }
+
   /// รวบรวมของในตะกร้าเป็นออเดอร์หนึ่งใบเพื่อส่งให้ order_repository
   FoodOrder buildOrder() {
+    const DeliveryInfo delivery = DeliveryInfo.demo;
     return FoodOrder(
       lines: lines,
-      total: totalPrice,
+      subtotal: totalPrice,
+      deliveryFee: delivery.fee,
+      total: totalPrice + delivery.fee,
       createdAt: DateTime.now(),
+      restaurantId: restaurant?.id ?? '',
+      restaurantName: restaurant?.name ?? '',
+      address: delivery.address,
     );
   }
 }

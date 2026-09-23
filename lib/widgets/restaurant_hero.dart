@@ -1,44 +1,61 @@
 // ============================================================================
-// shop_hero.dart — หัวหน้าแรก ภาพร้านเต็มความกว้างพร้อมข้อมูลร้าน
+// restaurant_hero.dart — หัวจอของร้านที่เลือก ภาพเต็มความกว้างพร้อมข้อมูลร้าน
 //
 // ── ส่วนที่ให้มาแล้ว (ไม่ต้องแก้ในแล็บนี้) ──────────────────────────────────
-//   - ภาพร้านพร้อมแถบไล่สีทับด้านล่าง เพื่อให้ตัวอักษรสีขาวอ่านออกบนภาพทุกภาพ
-//   - ชื่อร้าน คำอธิบาย ป้ายคะแนน เวลาส่ง และสถานะเปิดร้าน
+//   - ภาพร้านพร้อมแถบไล่สีทับ เพื่อให้ตัวอักษรสีขาวอ่านออกบนภาพทุกภาพ
+//   - ปุ่มถอยกลับ ชื่อร้าน ประเภทอาหาร และป้ายคะแนน เวลาส่ง ระยะทาง
 //
 // ไฟล์นี้ไม่มีจุดที่ต้องเติม
 // ============================================================================
 import 'package:flutter/material.dart';
 
-import '../data/shop_info.dart';
+import '../models/restaurant.dart';
 import '../theme.dart';
 import 'food_image.dart';
 
-class ShopHero extends StatelessWidget {
-  const ShopHero({super.key, required this.shop});
+class RestaurantHero extends StatelessWidget {
+  const RestaurantHero({super.key, required this.restaurant});
 
-  final ShopInfo shop;
+  final Restaurant restaurant;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 208,
+      height: 216,
       width: double.infinity,
       child: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          FoodImage(path: shop.heroImage, width: double.infinity, height: 208),
-          // แถบไล่สีจากใสไปเข้ม ทำให้ตัวอักษรสีขาวอ่านออกไม่ว่าภาพจะสว่างแค่ไหน
+          FoodImage(
+            path: restaurant.imagePath,
+            width: double.infinity,
+            height: 216,
+          ),
+          // แถบไล่สีทั้งบนและล่าง บนไว้ให้ปุ่มถอยกลับอ่านออก ล่างไว้ให้ข้อความอ่านออก
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: <Color>[
+                  Color(0x73000000),
                   Color(0x00000000),
                   Color(0x66000000),
-                  Color(0xCC000000),
+                  Color(0xD9000000),
                 ],
-                stops: <double>[0.30, 0.62, 1],
+                stops: <double>[0, 0.30, 0.64, 1],
+              ),
+            ),
+          ),
+          Positioned(
+            left: AppSpace.sm,
+            top: AppSpace.sm,
+            child: SafeArea(
+              bottom: false,
+              child: IconButton(
+                onPressed: () => Navigator.of(context).maybePop(),
+                tooltip: 'ย้อนกลับ',
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
               ),
             ),
           ),
@@ -50,18 +67,18 @@ class ShopHero extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  shop.name,
+                  restaurant.name,
                   style: const TextStyle(
-                    fontSize: 26,
+                    fontSize: 25,
                     height: 1.35,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
                 ),
                 Text(
-                  shop.tagline,
+                  '${restaurant.foodTypes.join(' · ')}  ·  ${restaurant.area}',
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 13.5,
                     height: 1.45,
                     color: Color(0xFFF2E9E2),
                   ),
@@ -73,16 +90,21 @@ class ShopHero extends StatelessWidget {
                   children: <Widget>[
                     _chip(
                       icon: Icons.star,
-                      text: '${shop.rating} (${shop.ratingCount})',
+                      text: '${restaurant.rating} (${restaurant.ratingCount})',
                     ),
                     _chip(
                       icon: Icons.schedule,
-                      text: 'ส่ง ${shop.deliveryMinutes} นาที',
+                      text: 'ส่ง ${restaurant.deliveryMinutes} นาที',
                     ),
                     _chip(
-                      icon: shop.isOpen ? Icons.check_circle : Icons.cancel,
-                      text: shop.isOpen ? 'เปิดอยู่' : 'ปิดแล้ว',
+                      icon: Icons.place_outlined,
+                      text: '${restaurant.distanceKm} กม.',
                     ),
+                    if (restaurant.freeDelivery)
+                      _chip(
+                        icon: Icons.local_shipping_outlined,
+                        text: 'ส่งฟรี',
+                      ),
                   ],
                 ),
               ],
@@ -93,7 +115,6 @@ class ShopHero extends StatelessWidget {
     );
   }
 
-  /// ป้ายข้อมูลหนึ่งอัน พื้นขาวโปร่ง ตัวอักษรสีเข้ม อ่านออกบนภาพทุกภาพ
   Widget _chip({required IconData icon, required String text}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpace.md, vertical: 6),

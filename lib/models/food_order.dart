@@ -43,17 +43,40 @@ class OrderLine {
 class FoodOrder {
   const FoodOrder({
     required this.lines,
+    required this.subtotal,
+    required this.deliveryFee,
     required this.total,
     required this.createdAt,
+    required this.restaurantId,
+    required this.restaurantName,
+    required this.address,
+    this.status = 'waiting',
   });
 
   final List<OrderLine> lines;
 
-  /// ยอดรวมของทั้งออเดอร์ เป็นบาท
+  /// ค่าอาหารรวม ยังไม่รวมค่าส่ง
+  final int subtotal;
+
+  /// ค่าส่ง เป็นบาท
+  final int deliveryFee;
+
+  /// ยอดที่ต้องจ่ายจริง = ค่าอาหาร + ค่าส่ง
   final int total;
 
   /// เวลาที่ผู้ใช้กดสั่ง
   final DateTime createdAt;
+
+  /// ร้านที่สั่ง
+  final String restaurantId;
+  final String restaurantName;
+
+  /// ที่อยู่ปลายทางที่จะเอาอาหารไปส่ง
+  final String address;
+
+  /// สถานะของออเดอร์ — ค่าตั้งต้นคือ waiting แปลว่ายังไม่มีคนส่งรับงาน
+  /// สัปดาห์ถัดไปจะมีบทบาทคนส่งอาหารเข้ามาเปลี่ยนค่านี้
+  final String status;
 
   /// แปลงออเดอร์เป็นรูป Map
   ///
@@ -62,7 +85,13 @@ class FoodOrder {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'items': lines.map((OrderLine line) => line.toMap()).toList(),
+      'restaurantId': restaurantId,
+      'restaurantName': restaurantName,
+      'address': address,
+      'subtotal': subtotal,
+      'deliveryFee': deliveryFee,
       'total': total,
+      'status': status,
       'createdAt': createdAt,
     };
   }
